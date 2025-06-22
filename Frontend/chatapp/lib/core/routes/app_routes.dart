@@ -1,3 +1,4 @@
+import 'package:chatapp/features/chat/presentation/screens/chat_screen.dart';
 import 'package:chatapp/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/features/auth/presentation/screens/login_screen.dart';
@@ -9,6 +10,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String home = '/home';
+  static const String chat = '/chat';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -20,6 +22,15 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SignupScreen());
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case chat:
+        final args = settings.arguments as ChatScreenArgs;
+        return MaterialPageRoute(
+          builder:
+              (_) => ChatScreen(
+                receiver: args.receiver,
+                currentUserId: args.currentUserId,
+              ),
+        );
       default:
         return MaterialPageRoute(
           builder:

@@ -2,6 +2,13 @@ import 'package:chatapp/features/auth/cubit/auth_status_cubit.dart';
 import 'package:chatapp/features/auth/data/datasource/auth_datasource.dart';
 import 'package:chatapp/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:chatapp/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:chatapp/features/chat/data/datasource/chat_socket_client.dart';
+import 'package:chatapp/features/chat/data/repository/chat_repository_impl.dart';
+import 'package:chatapp/features/chat/domain/repository/chat_repository.dart';
+import 'package:chatapp/features/users_list/data/datasource/user_datasource.dart';
+import 'package:chatapp/features/users_list/data/repository/users_repository_impl.dart';
+import 'package:chatapp/features/users_list/domain/repository/user_repository.dart';
+import 'package:chatapp/features/users_list/presentation/bloc/user_list_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../features/auth/domain/repository/auth_repository.dart';
@@ -14,19 +21,28 @@ Future<void> setupLocator() async {
   final dio = await DioClient.getInstance();
   sl.registerLazySingleton(() => dio);
 
-  // 2. Data source
+  // Auth Feature
   sl.registerLazySingleton<AuthDatasource>(() => AuthDatasource(dio: sl()));
-
-  // 3. Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(authDatasource: sl()),
   );
-
-  // 4. Bloc
   sl.registerFactory(() => AuthBloc(authRepository: sl()));
 
-  //  5. Auth status cubit
+  //   Auth status cubit
   sl.registerLazySingleton<AuthStatusCubit>(
     () => AuthStatusCubit(authRepository: sl()),
+  );
+
+  // All Users Feature
+  sl.registerLazySingleton(() => UserDatasource(dio: sl()));
+  sl.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(userDatasource: sl()),
+  );
+  sl.registerFactory(() => UserListBloc(userRepository: sl()));
+
+  // Chat feature
+  sl.registerLazySingleton(() => ChatSocketClient());
+  sl.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(client: sl()),
   );
 }
