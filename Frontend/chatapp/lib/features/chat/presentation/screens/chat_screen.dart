@@ -23,11 +23,14 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create:
-          (_) => ChatBloc(
-            chatRepository: sl<ChatRepository>(),
-            currentUserId: currentUserId,
-            receiverId: receiver.id,
-          )..add(ConnectSocket()),
+          (_) =>
+              ChatBloc(
+                  chatRepository: sl<ChatRepository>(),
+                  currentUserId: currentUserId,
+                  receiverId: receiver.id,
+                )
+                ..add(LoadChatHistory())
+                ..add(ConnectSocket()),
       child: _ChatView(receiver: receiver, currentUserId: currentUserId),
     );
   }
@@ -45,7 +48,6 @@ class _ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<_ChatView> {
   final _controller = TextEditingController();
-
   void _sendMessage(BuildContext context) {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
@@ -54,6 +56,7 @@ class _ChatViewState extends State<_ChatView> {
       senderId: widget.currentUserId,
       receiverId: widget.receiver.id,
       content: text,
+      isRead: false,
       createdAt: DateTime.now(),
     );
 
@@ -84,7 +87,7 @@ class _ChatViewState extends State<_ChatView> {
 
                     return MessageBubble(
                       message: msg.content,
-                      timestamp: DateFormat.Hm().format(msg.createdAt),
+                      timestamp: DateFormat('h:mm a').format(msg.createdAt),
                       isMe: isMe,
                     );
                   },
@@ -104,8 +107,10 @@ class _ChatViewState extends State<_ChatView> {
                     ),
                   ),
                 ),
+
                 IconButton(
                   icon: const Icon(Icons.send),
+                  iconSize: 28,
                   onPressed: () => _sendMessage(context),
                 ),
               ],
@@ -117,6 +122,7 @@ class _ChatViewState extends State<_ChatView> {
   }
 }
 
+// Model screen arguments
 class ChatScreenArgs {
   final UserEntity receiver;
   final String currentUserId;

@@ -12,51 +12,116 @@ class UserListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = sl<AuthStatusCubit>().state;
-    String? currentUserId;
+    return BlocConsumer<AuthStatusCubit, AuthStatusState>(
+      listener: (context, state) {
+        if (state is AuthStatusUnauthenticated) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.login,
+            (route) => false,
+          );
+        }
+      },
+      builder: (context, authState) {
+        if (authState is AuthStatusLoading || authState is AuthStatusInitial) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(color: Colors.deepPurple),
+            ),
+          );
+        } else if (authState is AuthStatusUnauthenticated) {
+          // Redirect to login if needed
+          return const Scaffold(body: Center(child: Text('Please login')));
+        } else if (authState is AuthStatusAuthenticated) {
+          final currentUserId = authState.user.id;
+          final userName = authState.user.username;
 
-    if (authState is AuthStatusAuthenticated) {
-      currentUserId = authState.user.id;
-    }
-
-    return BlocProvider(
-      create: (_) => sl<UserListBloc>()..add(FetchAllUsers()),
-      child: Scaffold(
-        appBar: AppBar(title: const Text("All Chats")),
-        body: BlocBuilder<UserListBloc, UserListState>(
-          builder: (context, state) {
-            if (state is UserListLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is UserListLoaded) {
-              return ListView.builder(
-                itemCount: state.users.length,
-                itemBuilder: (context, index) {
-                  final user = state.users[index];
-                  if (user.id == currentUserId) return const SizedBox.shrink();
-                  return UserTile(
-                    user: user,
-                    onTap: () {
-                      if (currentUserId != null) {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.chat,
-                          arguments: ChatScreenArgs(
-                            receiver: user,
-                            currentUserId: currentUserId,
-                          ),
-                        );
+          return BlocProvider(
+            create: (_) => sl<UserListBloc>()..add(FetchAllUsers()),
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text("All Chats"),
+                actions: [
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        context.read<AuthStatusCubit>().logout();
                       }
                     },
-                  );
+                    itemBuilder:
+                        (context) => [
+                          PopupMenuItem<String>(
+                            value: 'username',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.person, color: Colors.grey),
+                                const SizedBox(width: 8),
+                                Text(userName),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuDivider(),
+                          PopupMenuItem<String>(
+                            value: 'logout',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.logout, color: Colors.red),
+                                const SizedBox(width: 8),
+                                const Text("Logout"),
+                              ],
+                            ),
+                          ),
+                        ],
+                  ),
+                ],
+                // actions: [
+                //   IconButton(
+                //     onPressed: () {
+                //       context.read<AuthStatusCubit>().logout();
+                //     },
+                //     icon: const Icon(Icons.logout, color: Colors.red),
+                //   ),
+                // ],
+              ),
+              body: BlocBuilder<UserListBloc, UserListState>(
+                builder: (context, state) {
+                  if (state is UserListLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is UserListLoaded) {
+                    return ListView.builder(
+                      itemCount: state.users.length,
+                      itemBuilder: (context, index) {
+                        final user = state.users[index];
+                        if (user.id == currentUserId) {
+                          return const SizedBox.shrink();
+                        }
+                        return UserTile(
+                          user: user,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.chat,
+                              arguments: ChatScreenArgs(
+                                receiver: user,
+                                currentUserId: currentUserId,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  } else if (state is UserListError) {
+                    return Center(child: Text(state.message));
+                  }
+                  return const SizedBox.shrink();
                 },
-              );
-            } else if (state is UserListError) {
-              return Center(child: Text(state.message));
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-      ),
+              ),
+            ),
+          );
+        }
+
+        return const SizedBox.shrink(); // fallback
+      },
     );
   }
 }

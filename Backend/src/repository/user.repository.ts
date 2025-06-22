@@ -16,6 +16,6 @@ export const getAllUsersExcept = async (currentUserId: string) => {
     });
   } catch (err) {
     console.error(" Error fetching users:", err);
-    throw new Error("Failed to fetch users");
+    throw err;
   }
 };

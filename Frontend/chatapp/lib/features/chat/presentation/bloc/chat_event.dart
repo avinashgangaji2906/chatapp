@@ -22,3 +22,5 @@ class ReceiveMessage extends ChatEvent {
   @override
   List<Object> get props => [message];
 }
+
+class LoadChatHistory extends ChatEvent {}

@@ -1,12 +1,13 @@
 import { Server } from "socket.io";
-import cookie from "cookie";
-import signature from "cookie-signature";
+import * as cookie from "cookie";
+import * as signature from "cookie-signature";
 import { registerMessageHandlers } from "./messageHandler";
 
 export const setupSocket = (io: Server) => {
   io.on("connection", (socket) => {
     try {
       const rawCookie = socket.handshake.headers.cookie || "";
+
       const cookies = cookie.parse(rawCookie);
       const signedSession = cookies["session"];
 

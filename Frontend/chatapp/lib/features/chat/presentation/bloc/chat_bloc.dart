@@ -31,6 +31,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ReceiveMessage>((event, emit) {
       emit(ChatUpdated([...state.messages, event.message]));
     });
+
+    on<LoadChatHistory>((event, emit) async {
+      try {
+        final messages = await chatRepository.getChatHistory(
+          receiverId: receiverId,
+        );
+        emit(ChatUpdated(messages));
+      } catch (e) {
+        emit(ChatUpdated([])); // fallback or use a ChatError if needed
+      }
+    });
   }
 
   @override

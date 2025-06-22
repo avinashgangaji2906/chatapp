@@ -1,3 +1,5 @@
+import 'package:chatapp/core/routes/app_routes.dart';
+import 'package:chatapp/features/auth/cubit/auth_status_cubit.dart';
 import 'package:chatapp/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:chatapp/features/auth/presentation/widgets/app_button.dart';
 import 'package:chatapp/features/auth/presentation/widgets/app_text_field.dart';
@@ -51,9 +53,12 @@ class _SignupScreenState extends State<SignupScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
+            context.read<AuthStatusCubit>().checkAuthStatus();
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('Signup successful!')));
+            // navigate user to home screen
+            Navigator.pushReplacementNamed(context, AppRoutes.usersList);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(
               context,
@@ -130,7 +135,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         alignment: Alignment.center,
                         child: TextButton(
                           onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/login');
+                            Navigator.pushReplacementNamed(
+                              context,
+                              AppRoutes.login,
+                            );
                           },
                           child: const Text("Already have an account? Login"),
                         ),

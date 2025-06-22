@@ -13,7 +13,7 @@ export const getChatHistory = async (req: AuthRequest, res: Response) => {
 
     res.status(StatusCodes.OK).json({
       success: true,
-      messages,
+      messages, //list of messages
     });
   } catch (err: any) {
     console.error("Fetch Chat History Error:", err);

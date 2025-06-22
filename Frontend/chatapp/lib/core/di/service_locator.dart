@@ -2,6 +2,7 @@ import 'package:chatapp/features/auth/cubit/auth_status_cubit.dart';
 import 'package:chatapp/features/auth/data/datasource/auth_datasource.dart';
 import 'package:chatapp/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:chatapp/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:chatapp/features/chat/data/datasource/chat_data_source.dart';
 import 'package:chatapp/features/chat/data/datasource/chat_socket_client.dart';
 import 'package:chatapp/features/chat/data/repository/chat_repository_impl.dart';
 import 'package:chatapp/features/chat/domain/repository/chat_repository.dart';
@@ -42,7 +43,8 @@ Future<void> setupLocator() async {
 
   // Chat feature
   sl.registerLazySingleton(() => ChatSocketClient());
+  sl.registerLazySingleton(() => ChatDataSource(dio: sl()));
   sl.registerLazySingleton<ChatRepository>(
-    () => ChatRepositoryImpl(client: sl()),
+    () => ChatRepositoryImpl(client: sl(), chatDataSource: sl()),
   );
 }

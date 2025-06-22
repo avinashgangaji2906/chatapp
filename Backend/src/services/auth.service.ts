@@ -28,7 +28,7 @@ export const createUser = async ({ username, password }: SignupInput) => {
     return user;
   } catch (error) {
     console.error("Error in createUser:", error);
-    throw new Error("Failed to create user");
+    throw error;
   }
 };
 
@@ -53,6 +53,6 @@ export const verifyUser = async ({ username, password }: LoginInput) => {
     };
   } catch (error) {
     console.error("Error in verifyUser:", error);
-    throw new Error("Login failed");
+    throw error;
   }
 };

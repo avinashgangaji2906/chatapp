@@ -9,6 +9,14 @@ class UserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(title: Text(user.username), onTap: onTap);
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.blueGrey.shade700,
+        child: Icon(Icons.person, color: Colors.white70),
+      ),
+      shape: Border(bottom: BorderSide(color: Colors.grey, width: 0.5)),
+      title: Text(user.username, style: TextStyle(fontSize: 18)),
+      onTap: onTap,
+    );
   }
 }

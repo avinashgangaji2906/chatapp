@@ -6,7 +6,7 @@ export const saveMessage = async (senderId: string, receiverId: string, content:
     if (!senderId || !receiverId || !content) {
       throw new Error("Missing required fields to save message");
     }
-
+    console.log(`Message Saved in DB with SenderId : ${senderId}, and content ${content}`);
     return await prisma.message.create({
       data: { senderId, receiverId, content },
     });

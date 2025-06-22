@@ -13,6 +13,7 @@ export const registerMessageHandlers = (io: Server, socket: Socket, userId: stri
     // Emit to receiver if connected
     io.sockets.sockets.forEach((s) => {
       if ((s.data as any).userId === receiverId) {
+        console.log(`Message Received from ${userId}, ${message}`);
         s.emit("message:receive", message);
       }
     });
