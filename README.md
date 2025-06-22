@@ -1,80 +1,107 @@
-# ChatApp
+# 💬 Realtime Chat App
 
-A full-stack real-time chat application with secure authentication using HTTP-only cookies. Built with a clean architecture for both frontend (Flutter) and backend (Node.js + TypeScript).
+A full-stack realtime chat application built with **Flutter** for the frontend and **Node.js (Express + TypeScript)** for the backend. It supports:
 
----
-
-## 🚀 Features
-
-- Secure HTTP-only cookie-based authentication (Login, Signup, Logout)
-- Real-time chat support (planned)
-- Clean Architecture with Bloc (Flutter)
-- Scalable RESTful API (Node.js + Express)
-- Persistent cookie storage in mobile app using `dio_cookie_manager`
-- Modern UI/UX with Flutter + custom theming
-- Docker-ready backend (optional)
+- ✅ Authentication using session cookies
+- ✅ Realtime messaging using WebSocket (Socket.IO)
+- ✅ Secure cookie-based session handling
+- ✅ Chat history retrieval from PostgreSQL
+- ✅ Clean architecture (Frontend) and layered architecture (Backend)
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
-### 🔹 Frontend (Flutter)
+### 🚀 Frontend (Flutter)
 
-- Flutter (Clean Architecture)
-- BLoC + Cubit for state management
-- Dio (with CookieManager) for networking
-- GetIt for dependency injection
-- PathProvider + PersistCookieJar for secure cookie handling
+- **Flutter** with Dart
+- **BLoC** for state management
+- **Dio** for HTTP networking
+- **Socket.IO Client**
+- **Equatable**, **GetIt** for DI
 
-### 🔹 Backend (Node.js)
+### 🛡 Backend (Node.js)
 
-- Node.js with Express.js
-- TypeScript
-- PostgreSQL + Prisma ORM
-- Redis (for sessions, caching)
-- HTTP-only cookie authentication
-- Zod (for schema validation)
+- **Node.js + Express + TypeScript**
+- **Socket.IO** for websocket communication
+- **PostgreSQL** with **Prisma ORM**
+- **Redis** (optional, used in caching/session/job queues)
+- **JWT** (optional, not currently used)
+- **Cookie-based HTTP-only authentication**
+- **Docker (optional)** for containerization
 
 ---
 
-## 📁 Folder Structure
+## ⚙️ Features
 
-chatapp/
-│
-├── backend/ # Node.js + TypeScript backend
+- 👤 **User Authentication** (Login, Signup, Logout)
+- 🔐 **Secure session cookies** with Redis-backed sessions
+- 🗨 **Realtime chat** using WebSockets (Socket.IO)
+- 💾 **Chat history** stored in PostgreSQL
+- 🚦 **Message delivery acknowledgment** and syncing
+- 📱 Responsive mobile UI using Flutter
+
+---
+
+## 📁 Project Structure
+
+project-root/
+├── Backend/
 │ ├── src/
-│ ├── prisma/
-│ └── .env
+│ │ ├── auth/ # Auth APIs
+│ │ ├── chat/ # Chat APIs & message services
+│ │ ├── config/ # DB, Redis, environment setup
+│ │ ├── sockets/ # Socket.IO handlers
+│ │ ├── app.ts
+│ │ ├── server.ts
+│ └── .env # Environment variables
 │
-├── frontend/ # Flutter mobile app
-│ ├── lib/
-│ ├── android/
-│ ├── ios/
-│ └── pubspec.yaml
-│
-└── README.md
+├── Frontend/
+│ └── lib/
+│ ├── core/
+│ ├── features/
+│ │ ├── auth/
+│ │ ├── chat/
+│ │ ├── users/
+│ └── main.dart
 
 ---
 
-## 🧾 Prerequisites
+## 📦 Getting Started
 
-- Flutter (v3.0+)
-- Node.js (v18+)
-- PostgreSQL
-- Redis
-- Git
-
----
-
-## ⚙️ Backend Setup
-
-### 1. Go to backend folder
+### 🔁 Clone the Repository
 
 ```bash
-cd backend
+git clone https://github.com/your-username/chatapp.git
+cd chatapp
 
+
+## Running Server
+cd Backend
 npm install
 
-## Flutter Run
-cd frontend
+PORT=3000
+DATABASE_URL=postgresql://<username>:<password>@localhost:5432/<dbname>?schema=public
+COOKIE_SECRET=developer
+REDIS_URL=redis://localhost:6379
+
+
+npx prisma generate
+npx prisma migrate dev
+
+npm run dev
+
+## Running Flutter App
+
+cd Frontend
+cd chatapp
+
+flutter pub get
+
+flutter run
+
+
+
+
+
 ```
