@@ -14,3 +14,12 @@ model User {
     password  String
     createdAt DateTime @default(now())
 }
+
+model Message {
+    id         String   @id @default(uuid())
+    senderId   String
+    receiverId String
+    content    String
+    createdAt  DateTime @default(now())
+    isRead     Boolean  @default(false)
+}
