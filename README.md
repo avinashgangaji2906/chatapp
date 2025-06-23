@@ -100,7 +100,9 @@ flutter pub get
 
 flutter run
 
+## Update the BaseUrl in `dio_client` and `chat_socket_client` with ip of machine on which the backend is running. App internet connection should also be connected with same internet on which backend is running.
 
+baseUrl: "http://<local-ip-address>:3000/api"
 
 
 
