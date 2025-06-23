@@ -6,7 +6,6 @@ import 'package:chatapp/features/users_list/domain/entity/user_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import '../bloc/chat_bloc.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -48,11 +47,14 @@ class _ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<_ChatView> {
   final _controller = TextEditingController();
+  final _scrollController = ScrollController();
+
   void _sendMessage(BuildContext context) {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
     final message = MessageEntity(
+      id: null,
       senderId: widget.currentUserId,
       receiverId: widget.receiver.id,
       content: text,
@@ -62,6 +64,19 @@ class _ChatViewState extends State<_ChatView> {
 
     context.read<ChatBloc>().add(SendMessage(message));
     _controller.clear();
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -71,11 +86,20 @@ class _ChatViewState extends State<_ChatView> {
       body: Column(
         children: [
           Expanded(
-            child: BlocBuilder<ChatBloc, ChatState>(
+            child: BlocConsumer<ChatBloc, ChatState>(
+              listener: (context, state) {
+                if (state is ChatUpdated) {
+                  print(
+                    '🖥️ ChatUpdated with ${state.messages.length} messages',
+                  );
+                  _scrollToBottom();
+                }
+              },
               builder: (context, state) {
                 final messages = state.messages;
-
+                print('🖥️ Building UI with ${messages.length} messages');
                 return ListView.builder(
+                  controller: _scrollController,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 8,
@@ -84,10 +108,11 @@ class _ChatViewState extends State<_ChatView> {
                   itemBuilder: (_, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == widget.currentUserId;
-
                     return MessageBubble(
                       message: msg.content,
-                      timestamp: DateFormat('h:mm a').format(msg.createdAt),
+                      timestamp: DateFormat(
+                        'h:mm a',
+                      ).format(msg.createdAt.toLocal()),
                       isMe: isMe,
                     );
                   },
@@ -105,9 +130,9 @@ class _ChatViewState extends State<_ChatView> {
                     decoration: const InputDecoration(
                       hintText: 'Type message...',
                     ),
+                    onSubmitted: (_) => _sendMessage(context),
                   ),
                 ),
-
                 IconButton(
                   icon: const Icon(Icons.send),
                   iconSize: 28,
@@ -120,9 +145,15 @@ class _ChatViewState extends State<_ChatView> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 }
 
-// Model screen arguments
 class ChatScreenArgs {
   final UserEntity receiver;
   final String currentUserId;

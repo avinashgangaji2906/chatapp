@@ -13,6 +13,7 @@ class AuthDatasource {
     required String password,
   }) async {
     try {
+      await DioClient.clearCookies(); // remove stale cookie
       final response = await dio.post(
         '/auth/login',
         data: {'username': username, 'password': password},
@@ -41,6 +42,8 @@ class AuthDatasource {
     required String password,
   }) async {
     try {
+      await DioClient.clearCookies(); // remove stale cookie
+
       final response = await dio.post(
         '/auth/signup',
         data: {'username': username, 'password': password},

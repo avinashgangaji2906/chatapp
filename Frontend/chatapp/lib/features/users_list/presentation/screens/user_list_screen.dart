@@ -74,14 +74,6 @@ class UserListScreen extends StatelessWidget {
                         ],
                   ),
                 ],
-                // actions: [
-                //   IconButton(
-                //     onPressed: () {
-                //       context.read<AuthStatusCubit>().logout();
-                //     },
-                //     icon: const Icon(Icons.logout, color: Colors.red),
-                //   ),
-                // ],
               ),
               body: BlocBuilder<UserListBloc, UserListState>(
                 builder: (context, state) {

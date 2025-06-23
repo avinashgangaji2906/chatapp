@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:chatapp/features/chat/domain/entity/message_entity.dart';
 import 'package:chatapp/features/chat/domain/repository/chat_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,20 +17,39 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.currentUserId,
     required this.receiverId,
   }) : super(ChatInitial()) {
-    on<ConnectSocket>((event, emit) {
-      chatRepository.connectSocket(currentUserId);
-      chatRepository.onMessageReceived((message) {
+    // Register message listener immediately
+    chatRepository.onMessageReceived((message) {
+      // Filter messages for this chat
+      if (message.senderId == receiverId || message.receiverId == receiverId) {
+        log('📩 Received relevant message: ${message.content}');
         add(ReceiveMessage(message));
-      });
+      } else {
+        log(
+          '📩 Ignored message from ${message.senderId} to ${message.receiverId}',
+        );
+      }
+    });
+
+    on<ConnectSocket>((event, emit) async {
+      try {
+        await chatRepository.connectSocket(currentUserId);
+      } catch (e) {
+        log('❌ Error connecting socket: $e');
+      }
     });
 
     on<SendMessage>((event, emit) {
       chatRepository.sendMessage(event.message);
-      emit(ChatUpdated([...state.messages, event.message]));
+      final updatedMessages = [...state.messages, event.message];
+      emit(ChatUpdated(updatedMessages));
     });
 
     on<ReceiveMessage>((event, emit) {
-      emit(ChatUpdated([...state.messages, event.message]));
+      if (!state.messages.any((msg) => msg.id == event.message.id)) {
+        log('📩 Processing ReceiveMessage: ${event.message.content}');
+        final updatedMessages = [...state.messages, event.message];
+        emit(ChatUpdated(updatedMessages));
+      }
     });
 
     on<LoadChatHistory>((event, emit) async {
@@ -39,14 +59,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
         emit(ChatUpdated(messages));
       } catch (e) {
-        emit(ChatUpdated([])); // fallback or use a ChatError if needed
+        log('❌ Error loading chat history: $e');
+        emit(ChatUpdated([]));
       }
     });
   }
 
-  @override
   Future<void> close() {
-    chatRepository.disconnect();
     return super.close();
   }
 }

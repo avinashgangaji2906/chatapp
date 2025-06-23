@@ -1,5 +1,7 @@
-class MessageEntity {
-  // final String id;
+import 'package:equatable/equatable.dart';
+
+class MessageEntity extends Equatable {
+  final String? id; // Make id nullable
   final String senderId;
   final String receiverId;
   final String content;
@@ -7,11 +9,21 @@ class MessageEntity {
   final DateTime createdAt;
 
   const MessageEntity({
-    // required this.id,
+    this.id,
     required this.senderId,
     required this.receiverId,
     required this.content,
     required this.isRead,
     required this.createdAt,
   });
+
+  @override
+  List<Object?> get props => [
+    id,
+    senderId,
+    receiverId,
+    content,
+    isRead,
+    createdAt,
+  ];
 }

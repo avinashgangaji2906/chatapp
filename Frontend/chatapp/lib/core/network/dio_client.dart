@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -55,6 +56,14 @@ class DioClient {
 
   /// Clears all stored cookies
   static Future<void> clearCookies() async {
-    await _cookieJar?.deleteAll();
+    final dio = await getInstance();
+    final cookieManager =
+        dio.interceptors.firstWhere(
+              (i) => i is CookieManager,
+              orElse: () => throw Exception('CookieManager not found'),
+            )
+            as CookieManager;
+    await cookieManager.cookieJar.deleteAll();
+    log('Cookie Jar deleted on Logout');
   }
 }

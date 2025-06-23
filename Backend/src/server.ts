@@ -2,7 +2,7 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import app from "./app";
 import { connectToDatabase } from "./config/db";
-import "./config/redis";
+// import "./config/redis";
 import { setupSocket } from "./sockets/socketServer";
 
 const PORT = process.env.PORT || 3000;

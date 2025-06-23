@@ -42,7 +42,7 @@ Future<void> setupLocator() async {
   sl.registerFactory(() => UserListBloc(userRepository: sl()));
 
   // Chat feature
-  sl.registerLazySingleton(() => ChatSocketClient());
+  sl.registerSingleton<ChatSocketClient>(ChatSocketClient());
   sl.registerLazySingleton(() => ChatDataSource(dio: sl()));
   sl.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(client: sl(), chatDataSource: sl()),
