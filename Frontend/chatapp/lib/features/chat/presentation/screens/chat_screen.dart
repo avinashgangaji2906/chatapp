@@ -2,14 +2,14 @@ import 'package:chatapp/core/di/service_locator.dart';
 import 'package:chatapp/features/chat/domain/entity/message_entity.dart';
 import 'package:chatapp/features/chat/domain/repository/chat_repository.dart';
 import 'package:chatapp/features/chat/presentation/widgets/message_bubble.dart';
-import 'package:chatapp/features/users_list/domain/entity/user_entity.dart';
+import 'package:chatapp/features/users_list/domain/entity/user_list_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../bloc/chat_bloc.dart';
 
 class ChatScreen extends StatelessWidget {
-  final UserEntity receiver;
+  final UserListEntity receiver;
   final String currentUserId;
 
   const ChatScreen({
@@ -36,7 +36,7 @@ class ChatScreen extends StatelessWidget {
 }
 
 class _ChatView extends StatefulWidget {
-  final UserEntity receiver;
+  final UserListEntity receiver;
   final String currentUserId;
 
   const _ChatView({required this.receiver, required this.currentUserId});
@@ -155,7 +155,7 @@ class _ChatViewState extends State<_ChatView> {
 }
 
 class ChatScreenArgs {
-  final UserEntity receiver;
+  final UserListEntity receiver;
   final String currentUserId;
 
   ChatScreenArgs({required this.receiver, required this.currentUserId});

@@ -1,3 +1,4 @@
+import 'package:chatapp/core/constants/api_constants.dart';
 import 'package:chatapp/core/errors/dio_error_handler.dart';
 import 'package:chatapp/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
@@ -15,7 +16,7 @@ class AuthDatasource {
     try {
       await DioClient.clearCookies(); // remove stale cookie
       final response = await dio.post(
-        '/auth/login',
+        ApiConstants.login,
         data: {'username': username, 'password': password},
         options: Options(
           contentType: Headers.jsonContentType,
@@ -45,7 +46,7 @@ class AuthDatasource {
       await DioClient.clearCookies(); // remove stale cookie
 
       final response = await dio.post(
-        '/auth/signup',
+        ApiConstants.signup,
         data: {'username': username, 'password': password},
         options: Options(contentType: Headers.jsonContentType),
       );
@@ -67,7 +68,7 @@ class AuthDatasource {
   // Get User Session
   Future<AuthModel> getUserSession() async {
     try {
-      final response = await dio.get('/profile/me');
+      final response = await dio.get(ApiConstants.profile);
       final data = response.data;
 
       if (response.statusCode == 200 &&
@@ -85,7 +86,7 @@ class AuthDatasource {
   // logout user session from server
   Future<void> logout() async {
     try {
-      await dio.post('/auth/logout');
+      await dio.post(ApiConstants.logout);
       await DioClient.clearCookies();
     } catch (e) {
       throw DioErrorHandler.handle(e);

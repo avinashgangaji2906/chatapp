@@ -12,7 +12,7 @@ class UserListInitial extends UserListState {}
 class UserListLoading extends UserListState {}
 
 class UserListLoaded extends UserListState {
-  final List<UserEntity> users;
+  final List<UserListEntity> users;
 
   const UserListLoaded(this.users);
 

@@ -6,9 +6,9 @@ import 'package:chatapp/features/chat/data/datasource/chat_data_source.dart';
 import 'package:chatapp/features/chat/data/datasource/chat_socket_client.dart';
 import 'package:chatapp/features/chat/data/repository/chat_repository_impl.dart';
 import 'package:chatapp/features/chat/domain/repository/chat_repository.dart';
-import 'package:chatapp/features/users_list/data/datasource/user_datasource.dart';
-import 'package:chatapp/features/users_list/data/repository/users_repository_impl.dart';
-import 'package:chatapp/features/users_list/domain/repository/user_repository.dart';
+import 'package:chatapp/features/users_list/data/datasource/user_list_datasource.dart';
+import 'package:chatapp/features/users_list/data/repository/user_list_repository_impl.dart';
+import 'package:chatapp/features/users_list/domain/repository/user_list_repository.dart';
 import 'package:chatapp/features/users_list/presentation/bloc/user_list_bloc.dart';
 import 'package:get_it/get_it.dart';
 
@@ -35,9 +35,9 @@ Future<void> setupLocator() async {
   );
 
   // All Users Feature
-  sl.registerLazySingleton(() => UserDatasource(dio: sl()));
-  sl.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(userDatasource: sl()),
+  sl.registerLazySingleton(() => UserListDatasource(dio: sl()));
+  sl.registerLazySingleton<UserListRepository>(
+    () => UserListRepositoryImpl(userListDatasource: sl()),
   );
   sl.registerFactory(() => UserListBloc(userRepository: sl()));
 
