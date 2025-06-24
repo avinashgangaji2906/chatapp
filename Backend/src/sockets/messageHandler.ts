@@ -19,7 +19,7 @@ export const registerMessageHandlers = (io: Server, socket: Socket, userId: stri
       console.log(`Emitting message:receive: ${JSON.stringify(savedMessage)}`);
 
       // Emit to sender
-      socket.emit("message:receive", savedMessage);
+      // socket.emit("message:receive", savedMessage);
 
       // Emit to receiver
       const receiverSocket = getUserSocket(receiverId);

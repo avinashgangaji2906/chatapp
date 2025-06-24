@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:chatapp/core/constants/api_constants.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // ignore: library_prefixes
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -11,6 +12,7 @@ class ChatSocketClient {
 
   IO.Socket? _socket;
   bool _isConnecting = false;
+  final Map<String, List<Function>> _eventCallbacks = {};
 
   Future<void> connect(String userId) async {
     if (_socket != null && _socket!.connected) {
@@ -35,7 +37,7 @@ class ChatSocketClient {
               as CookieManager;
       final cookieJar = cookieManager.cookieJar;
 
-      final uri = Uri.parse('http://192.168.69.58:3000');
+      final uri = Uri.parse(ApiConstants.socketBaseUrl);
       final cookies = await cookieJar.loadForRequest(uri);
 
       final sessionCookie = cookies.firstWhere(
@@ -47,13 +49,13 @@ class ChatSocketClient {
       log('📦 Cookie Header: $cookieHeader');
 
       _socket = IO.io(
-        'http://192.168.69.58:3000',
+        ApiConstants.socketBaseUrl,
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .setTimeout(10000)
             .enableReconnection()
-            .setReconnectionDelay(1000) // Delay between reconnection attempts
-            .setReconnectionAttempts(5) // Max reconnection attempts
+            .setReconnectionDelay(1000)
+            .setReconnectionAttempts(5)
             .setExtraHeaders({'cookie': cookieHeader})
             .build(),
       );
@@ -74,14 +76,15 @@ class ChatSocketClient {
 
       _socket!.onDisconnect((reason) {
         log('🔌 Socket disconnected: $reason');
+        _clearAllListeners();
         _isConnecting = false;
       });
 
       _socket!.onReconnect((attempt) {
         log('🔄 Socket reconnected on attempt: $attempt');
+        _clearAllListeners(); // Clear listeners on reconnect to prevent duplicates
       });
 
-      // Debug all incoming events
       _socket!.onAny((event, data) {
         log('📡 Received socket event: $event with data: $data');
       });
@@ -99,10 +102,17 @@ class ChatSocketClient {
       log('⚠️ Socket not initialized');
       return;
     }
-    _socket!.on('message:receive', (data) {
-      log('📬 Received message: $data');
-      callback(data);
-    });
+
+    // Clear existing listeners for 'message:receive'
+    _socket!.off('message:receive');
+    _eventCallbacks['message:receive'] = [
+      _socket!.on('message:receive', (data) {
+        log('📬 Received message: $data');
+        callback(data);
+      }),
+    ];
+
+    log('📥 Registered new message:receive listener');
   }
 
   void sendMessage(Map<String, dynamic> payload) {
@@ -116,10 +126,20 @@ class ChatSocketClient {
 
   void disconnect() {
     if (_socket != null) {
-      _socket!.off('message:receive');
+      _clearAllListeners();
       _socket!.disconnect();
       _socket = null;
       log('🔌 Socket disconnected and cleaned up');
+    }
+  }
+
+  void _clearAllListeners() {
+    if (_socket != null) {
+      _eventCallbacks.forEach((event, callbacks) {
+        _socket!.off(event);
+      });
+      _eventCallbacks.clear();
+      log('🧹 Cleared all socket listeners');
     }
   }
 
